@@ -111,7 +111,7 @@ export default function AuthPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Seu ID</label>
+            <label className="text-sm font-medium text-foreground">Seu Nome</label>
             <Input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
