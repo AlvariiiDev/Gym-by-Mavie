@@ -35,7 +35,7 @@ export default function RestTimer() {
         if (prev <= 1) {
           stopTimer();
           // Vibration
-          if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+          if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300, 100, 300, 100, 300]);
           // Sound
           try {
             const ctx = new AudioContext();
@@ -43,7 +43,7 @@ export default function RestTimer() {
             osc.frequency.value = 880;
             osc.connect(ctx.destination);
             osc.start();
-            setTimeout(() => osc.stop(), 300);
+            setTimeout(() => osc.stop(), 1000);
           } catch {}
           return 0;
         }

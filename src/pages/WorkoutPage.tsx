@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import RestTimer from "@/components/RestTimer";
+import SetInput from "@/components/SetInput";
 import { toast } from "sonner";
 
 interface SetData {
@@ -126,12 +126,19 @@ export default function WorkoutPage() {
   };
 
   const updateSet = async (setId: string, field: string, value: any) => {
+    // Update local state immediately
+    setWorkouts(prev => prev.map(w => ({
+      ...w,
+      exercises: w.exercises.map(ex => ({
+        ...ex,
+        sets: ex.sets.map(s => s.id === setId ? { ...s, [field]: value, ...(field === "completed" && value === true ? { completed_at: new Date().toISOString() } : {}) } : s),
+      })),
+    })));
     const updateData: any = { [field]: value };
     if (field === "completed" && value === true) {
       updateData.completed_at = new Date().toISOString();
     }
     await supabase.from("sets").update(updateData).eq("id", setId);
-    loadWorkouts();
   };
 
   const deleteSet = async (setId: string) => {
@@ -244,17 +251,15 @@ export default function WorkoutPage() {
                         <span className="text-xs font-display text-muted-foreground">
                           {idx + 1}
                         </span>
-                        <Input
-                          type="number"
-                          value={set.weight || ""}
-                          onChange={(e) => updateSet(set.id, "weight", Number(e.target.value))}
-                          className="h-8 text-xs bg-background border-border text-center"
+                        <SetInput
+                          value={set.weight}
+                          field="weight"
+                          onSave={(v) => updateSet(set.id, "weight", v)}
                         />
-                        <Input
-                          type="number"
-                          value={set.reps || ""}
-                          onChange={(e) => updateSet(set.id, "reps", Number(e.target.value))}
-                          className="h-8 text-xs bg-background border-border text-center"
+                        <SetInput
+                          value={set.reps}
+                          field="reps"
+                          onSave={(v) => updateSet(set.id, "reps", v)}
                         />
                         <button
                           onClick={() => updateSet(set.id, "completed", !set.completed)}
@@ -301,7 +306,7 @@ export default function WorkoutPage() {
         ))}
       </div>
 
-      <RestTimer />
+      
     </div>
   );
 }

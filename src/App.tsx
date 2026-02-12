@@ -9,6 +9,7 @@ import FriendsPage from "./pages/FriendsPage";
 import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
 import BottomNav from "./components/BottomNav";
+import RestTimer from "./components/RestTimer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,7 +22,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     </div>
   );
   if (!user) return <Navigate to="/" replace />;
-  return <>{children}<BottomNav /></>;
+  return <>{children}<BottomNav /><RestTimer /></>;
 }
 
 function AuthRoute() {
