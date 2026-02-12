@@ -83,8 +83,8 @@ export default function AuthPage() {
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-display font-bold neon-text text-primary">
-            GYM<span className="text-secondary neon-text-orange">QUEST</span>
+          <h1 className="text-3xl font-display font-bold neon-text text-primary">GYM by Alvari
+            <span className="text-secondary neon-text-orange">Alvari</span>
           </h1>
           <p className="text-muted-foreground text-sm">Treine. Compita. Evolua.</p>
         </div>
@@ -94,17 +94,17 @@ export default function AuthPage() {
           <button
             onClick={() => setMode("login")}
             className={`flex-1 py-2 rounded-md text-sm font-display font-medium transition-all ${
-              mode === "login" ? "bg-primary text-primary-foreground neon-box" : "text-muted-foreground"
-            }`}
-          >
+            mode === "login" ? "bg-primary text-primary-foreground neon-box" : "text-muted-foreground"}`
+            }>
+
             ENTRAR
           </button>
           <button
             onClick={() => setMode("signup")}
             className={`flex-1 py-2 rounded-md text-sm font-display font-medium transition-all ${
-              mode === "signup" ? "bg-primary text-primary-foreground neon-box" : "text-muted-foreground"
-            }`}
-          >
+            mode === "signup" ? "bg-primary text-primary-foreground neon-box" : "text-muted-foreground"}`
+            }>
+
             CRIAR CONTA
           </button>
         </div>
@@ -116,8 +116,8 @@ export default function AuthPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Ex: guerreiro123"
-              className="bg-muted border-border focus:border-primary"
-            />
+              className="bg-muted border-border focus:border-primary" />
+
           </div>
 
           <div className="space-y-2">
@@ -128,33 +128,33 @@ export default function AuthPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Mínimo 6 caracteres"
-                className="bg-muted border-border focus:border-primary pr-10"
-              />
+                className="bg-muted border-border focus:border-primary pr-10" />
+
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-              >
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
-          {mode === "signup" && (
-            <div className="space-y-3">
+          {mode === "signup" &&
+          <div className="space-y-3">
               <label className="text-sm font-medium text-foreground">Escolha seu Personagem</label>
               <div className="grid grid-cols-4 gap-2">
-                {AVATARS.map((avatar) => (
-                  <button
-                    type="button"
-                    key={avatar.id}
-                    onClick={() => setSelectedAvatar(avatar.id)}
-                    className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
-                      selectedAvatar === avatar.id
-                        ? "bg-muted neon-box ring-1 ring-primary"
-                        : "hover:bg-muted/50"
-                    }`}
-                  >
+                {AVATARS.map((avatar) =>
+              <button
+                type="button"
+                key={avatar.id}
+                onClick={() => setSelectedAvatar(avatar.id)}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
+                selectedAvatar === avatar.id ?
+                "bg-muted neon-box ring-1 ring-primary" :
+                "hover:bg-muted/50"}`
+                }>
+
                     <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${avatar.color} flex items-center justify-center text-xl`}>
                       {avatar.emoji}
                     </div>
@@ -162,20 +162,20 @@ export default function AuthPage() {
                       {avatar.name}
                     </span>
                   </button>
-                ))}
+              )}
               </div>
             </div>
-          )}
+          }
 
           <Button
             type="submit"
             disabled={loading}
-            className="w-full gradient-primary text-primary-foreground font-display font-bold tracking-wider h-12 text-base neon-box"
-          >
+            className="w-full gradient-primary text-primary-foreground font-display font-bold tracking-wider h-12 text-base neon-box">
+
             {loading ? "..." : mode === "login" ? "ENTRAR" : "CRIAR CONTA"}
           </Button>
         </form>
       </div>
-    </div>
-  );
+    </div>);
+
 }
