@@ -21,12 +21,12 @@ export default function RestTimer() {
   }, []);
 
   const startTimer = useCallback((duration: number) => {
-    stopTimer();
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setTotalSeconds(duration);
     setSeconds(duration);
     setIsRunning(true);
     setIsOpen(true);
-  }, [stopTimer]);
+  }, []);
 
   useEffect(() => {
     if (!isRunning) return;
