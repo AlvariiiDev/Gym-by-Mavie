@@ -13,6 +13,7 @@ export default function RestTimer() {
   const [seconds, setSeconds] = useState(0);
   const [totalSeconds, setTotalSeconds] = useState(60);
   const [isRunning, setIsRunning] = useState(false);
+  const [timerKey, setTimerKey] = useState(0);
   const intervalRef = useRef<number | null>(null);
 
   const stopTimer = useCallback(() => {
@@ -25,6 +26,7 @@ export default function RestTimer() {
     setTotalSeconds(duration);
     setSeconds(duration);
     setIsRunning(true);
+    setTimerKey(k => k + 1);
     setIsOpen(true);
   }, []);
 
@@ -34,9 +36,7 @@ export default function RestTimer() {
       setSeconds(prev => {
         if (prev <= 1) {
           stopTimer();
-          // Vibration
           if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300, 100, 300, 100, 300]);
-          // Sound
           try {
             const ctx = new AudioContext();
             const osc = ctx.createOscillator();
@@ -51,7 +51,7 @@ export default function RestTimer() {
       });
     }, 1000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isRunning, stopTimer]);
+  }, [isRunning, timerKey, stopTimer]);
 
   const progress = totalSeconds > 0 ? ((totalSeconds - seconds) / totalSeconds) * 100 : 0;
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
