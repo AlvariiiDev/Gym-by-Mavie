@@ -178,7 +178,7 @@ export default function WorkoutPage() {
     await supabase.from("workouts").delete().eq("id", workoutId);
   };
 
-  const finishWorkout = (workoutId: string) => {
+  const finishWorkout = async (workoutId: string) => {
     const workout = workouts.find(w => w.id === workoutId);
     if (!workout) return;
     const completedSets = workout.exercises.flatMap(ex => ex.sets.filter(s => s.completed));
@@ -187,6 +187,22 @@ export default function WorkoutPage() {
     const totalExercises = workout.exercises.filter(ex => ex.sets.some(s => s.completed)).length;
     setSummaryData({ workoutName: workout.name, totalWeight, totalSets, totalExercises });
     setShowSummary(true);
+
+    // Uncheck all sets and collapse workout
+    setWorkouts(prev => prev.map(w => w.id === workoutId ? {
+      ...w,
+      exercises: w.exercises.map(ex => ({
+        ...ex,
+        sets: ex.sets.map(s => ({ ...s, completed: false })),
+      })),
+    } : w));
+    setActiveWorkout(null);
+
+    // Update in database
+    const allSetIds = workout.exercises.flatMap(ex => ex.sets.map(s => s.id));
+    if (allSetIds.length > 0) {
+      await supabase.from("sets").update({ completed: false, completed_at: null }).in("id", allSetIds);
+    }
   };
 
   if (loading) {
