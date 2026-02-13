@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AVATARS } from "@/lib/avatars";
-import { signUpUser, signInUser, createProfile, getProfileByUsername } from "@/lib/supabase-helpers";
+import { signUpUser, signInUser, createProfile, getProfile, getProfileByUsername } from "@/lib/supabase-helpers";
 import { toast } from "sonner";
 
 export default function AuthPage() {
@@ -47,7 +47,28 @@ export default function AuthPage() {
         }
 
         const { data, error } = await signUpUser(email, password);
-        if (error) throw error;
+        if (error) {
+          // User exists in auth but maybe profile was deleted - try signing in
+          if (error.message?.includes("already registered") || error.message?.includes("already exists")) {
+            const { data: loginData, error: loginError } = await signInUser(email, password);
+            if (loginError) {
+              toast.error("Este ID já existe. Verifique a senha.");
+              setLoading(false);
+              return;
+            }
+            if (loginData.user) {
+              // Recreate profile if missing
+              const { data: existingProfile } = await getProfile(loginData.user.id);
+              if (!existingProfile) {
+                await createProfile(loginData.user.id, username.trim(), selectedAvatar);
+              }
+              toast.success("Conta recuperada! Bem-vindo! 💪");
+              navigate("/workout");
+            }
+            return;
+          }
+          throw error;
+        }
         if (data.user) {
           const { error: profileError } = await createProfile(data.user.id, username.trim(), selectedAvatar);
           if (profileError) throw profileError;
