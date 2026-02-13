@@ -85,15 +85,15 @@ export default function WorkoutPage() {
 
   const createWorkout = async () => {
     if (!user || !newWorkoutName.trim()) return;
-    const { error } = await supabase.from("workouts").insert({
+    const { data, error } = await supabase.from("workouts").insert({
       user_id: user.id,
       name: newWorkoutName.trim(),
-    });
-    if (error) { toast.error("Erro ao criar treino"); return; }
+    }).select().single();
+    if (error || !data) { toast.error("Erro ao criar treino"); return; }
+    setWorkouts(prev => [{ id: data.id, name: data.name, exercises: [] }, ...prev]);
     setNewWorkoutName("");
     setShowNewWorkout(false);
     toast.success("Treino criado! 💪");
-    loadWorkouts();
   };
 
   const addExercise = async (workoutId: string) => {
@@ -102,31 +102,41 @@ export default function WorkoutPage() {
     if (!name?.trim()) return;
     const workout = workouts.find(w => w.id === workoutId);
     const sortOrder = workout ? workout.exercises.length : 0;
-    await supabase.from("exercises").insert({
+    const { data, error } = await supabase.from("exercises").insert({
       workout_id: workoutId,
       user_id: user.id,
       name: name.trim(),
       sort_order: sortOrder,
-    });
-    loadWorkouts();
+    }).select().single();
+    if (error || !data) { toast.error("Erro ao adicionar exercício"); return; }
+    setWorkouts(prev => prev.map(w => w.id === workoutId ? {
+      ...w,
+      exercises: [...w.exercises, { id: data.id, name: data.name, sort_order: data.sort_order, sets: [] }],
+    } : w));
   };
 
   const addSet = async (exerciseId: string) => {
     if (!user) return;
     const exercise = workouts.flatMap(w => w.exercises).find(e => e.id === exerciseId);
     const sortOrder = exercise ? exercise.sets.length : 0;
-    await supabase.from("sets").insert({
+    const { data, error } = await supabase.from("sets").insert({
       exercise_id: exerciseId,
       user_id: user.id,
       weight: 0,
       reps: 0,
       sort_order: sortOrder,
-    });
-    loadWorkouts();
+    }).select().single();
+    if (error || !data) { toast.error("Erro ao adicionar série"); return; }
+    setWorkouts(prev => prev.map(w => ({
+      ...w,
+      exercises: w.exercises.map(ex => ex.id === exerciseId ? {
+        ...ex,
+        sets: [...ex.sets, { id: data.id, weight: Number(data.weight), reps: data.reps, completed: data.completed, sort_order: data.sort_order }],
+      } : ex),
+    })));
   };
 
   const updateSet = async (setId: string, field: string, value: any) => {
-    // Update local state immediately
     setWorkouts(prev => prev.map(w => ({
       ...w,
       exercises: w.exercises.map(ex => ({
@@ -142,18 +152,28 @@ export default function WorkoutPage() {
   };
 
   const deleteSet = async (setId: string) => {
+    setWorkouts(prev => prev.map(w => ({
+      ...w,
+      exercises: w.exercises.map(ex => ({
+        ...ex,
+        sets: ex.sets.filter(s => s.id !== setId),
+      })),
+    })));
     await supabase.from("sets").delete().eq("id", setId);
-    loadWorkouts();
   };
 
   const deleteExercise = async (exerciseId: string) => {
+    setWorkouts(prev => prev.map(w => ({
+      ...w,
+      exercises: w.exercises.filter(ex => ex.id !== exerciseId),
+    })));
     await supabase.from("exercises").delete().eq("id", exerciseId);
-    loadWorkouts();
   };
 
   const deleteWorkout = async (workoutId: string) => {
+    setWorkouts(prev => prev.filter(w => w.id !== workoutId));
+    if (activeWorkout === workoutId) setActiveWorkout(null);
     await supabase.from("workouts").delete().eq("id", workoutId);
-    loadWorkouts();
   };
 
   if (loading) {
@@ -230,7 +250,6 @@ export default function WorkoutPage() {
                       </button>
                     </div>
 
-                    {/* Sets header */}
                     {exercise.sets.length > 0 && (
                       <div className="grid grid-cols-[1fr_1fr_1fr_auto_auto] gap-2 text-[10px] font-display text-muted-foreground px-1">
                         <span>SÉRIE</span>

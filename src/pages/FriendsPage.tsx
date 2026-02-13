@@ -122,12 +122,17 @@ export default function FriendsPage() {
   };
 
   const respondRequest = async (requestId: string, accept: boolean) => {
+    // Update local state immediately
+    const req = requests.find(r => r.id === requestId);
+    setRequests(prev => prev.filter(r => r.id !== requestId));
+    if (accept && req) {
+      setFriends(prev => [...prev, req.requester]);
+    }
+    toast.success(accept ? "Amigo adicionado! 🎉" : "Solicitação recusada");
     await supabase
       .from("friendships")
       .update({ status: accept ? "accepted" : "rejected" })
       .eq("id", requestId);
-    toast.success(accept ? "Amigo adicionado! 🎉" : "Solicitação recusada");
-    loadFriends();
   };
 
   return (
