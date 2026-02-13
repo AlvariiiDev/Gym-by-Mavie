@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, ChevronDown, ChevronUp, Check } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp, Check, Flag, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,8 @@ export default function WorkoutPage() {
   const [newWorkoutName, setNewWorkoutName] = useState("");
   const [showNewWorkout, setShowNewWorkout] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showSummary, setShowSummary] = useState(false);
+  const [summaryData, setSummaryData] = useState<{ workoutName: string; totalWeight: number; totalSets: number; totalExercises: number } | null>(null);
 
   const loadWorkouts = async () => {
     if (!user) return;
@@ -174,6 +176,17 @@ export default function WorkoutPage() {
     setWorkouts(prev => prev.filter(w => w.id !== workoutId));
     if (activeWorkout === workoutId) setActiveWorkout(null);
     await supabase.from("workouts").delete().eq("id", workoutId);
+  };
+
+  const finishWorkout = (workoutId: string) => {
+    const workout = workouts.find(w => w.id === workoutId);
+    if (!workout) return;
+    const completedSets = workout.exercises.flatMap(ex => ex.sets.filter(s => s.completed));
+    const totalWeight = completedSets.reduce((sum, s) => sum + s.weight * s.reps, 0);
+    const totalSets = completedSets.length;
+    const totalExercises = workout.exercises.filter(ex => ex.sets.some(s => s.completed)).length;
+    setSummaryData({ workoutName: workout.name, totalWeight, totalSets, totalExercises });
+    setShowSummary(true);
   };
 
   if (loading) {
@@ -319,13 +332,61 @@ export default function WorkoutPage() {
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
+
+                <button
+                  onClick={() => finishWorkout(workout.id)}
+                  className="w-full py-3 rounded-lg gradient-primary text-primary-foreground font-display font-bold text-sm flex items-center justify-center gap-2 neon-box"
+                >
+                  <Flag className="w-4 h-4" /> FINALIZAR TREINO
+                </button>
               </div>
             )}
           </div>
         ))}
       </div>
 
-      
+      {/* Summary overlay */}
+      {showSummary && summaryData && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="glass rounded-2xl p-6 max-w-sm w-full space-y-5 text-center animate-slide-up">
+            <button
+              onClick={() => setShowSummary(false)}
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="text-4xl">🏆</div>
+            <h2 className="text-lg font-display font-bold text-foreground">Treino Finalizado!</h2>
+            <p className="text-sm text-muted-foreground">{summaryData.workoutName}</p>
+            
+            <div className="glass rounded-xl p-4 space-y-3">
+              <div>
+                <span className="text-xs text-muted-foreground font-display">PESO TOTAL LEVANTADO</span>
+                <p className="text-3xl font-display font-bold text-secondary neon-text-orange">
+                  {summaryData.totalWeight.toLocaleString()}kg
+                </p>
+              </div>
+              <div className="flex justify-center gap-6">
+                <div>
+                  <span className="text-xs text-muted-foreground font-display">SÉRIES</span>
+                  <p className="text-lg font-display font-bold text-primary">{summaryData.totalSets}</p>
+                </div>
+                <div>
+                  <span className="text-xs text-muted-foreground font-display">EXERCÍCIOS</span>
+                  <p className="text-lg font-display font-bold text-primary">{summaryData.totalExercises}</p>
+                </div>
+              </div>
+            </div>
+
+            <Button
+              onClick={() => setShowSummary(false)}
+              className="w-full gradient-primary text-primary-foreground font-display font-bold neon-box"
+            >
+              FECHAR
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
