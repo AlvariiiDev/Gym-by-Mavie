@@ -188,7 +188,7 @@ export default function WorkoutPage() {
     setSummaryData({ workoutName: workout.name, totalWeight, totalSets, totalExercises });
     setShowSummary(true);
 
-    // Uncheck all sets and collapse workout
+    // Uncheck all sets locally and collapse workout (but keep completed_at in DB for ranking)
     setWorkouts(prev => prev.map(w => w.id === workoutId ? {
       ...w,
       exercises: w.exercises.map(ex => ({
@@ -198,10 +198,10 @@ export default function WorkoutPage() {
     } : w));
     setActiveWorkout(null);
 
-    // Update in database
+    // Reset completed flag in DB but KEEP completed_at so ranking can use it
     const allSetIds = workout.exercises.flatMap(ex => ex.sets.map(s => s.id));
     if (allSetIds.length > 0) {
-      await supabase.from("sets").update({ completed: false, completed_at: null }).in("id", allSetIds);
+      await supabase.from("sets").update({ completed: false }).in("id", allSetIds);
     }
   };
 

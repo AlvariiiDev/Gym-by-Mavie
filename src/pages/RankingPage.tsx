@@ -64,7 +64,7 @@ export default function RankingPage() {
         .from("sets")
         .select("weight, reps")
         .eq("user_id", uid)
-        .eq("completed", true)
+        .not("completed_at", "is", null)
         .gte("completed_at", since);
 
       const total = (sets || []).reduce((sum, s) => sum + Number(s.weight) * s.reps, 0);

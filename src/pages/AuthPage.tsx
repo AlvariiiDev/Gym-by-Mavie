@@ -8,7 +8,7 @@ import { signUpUser, signInUser, createProfile, getProfile, getProfileByUsername
 import { toast } from "sonner";
 
 export default function AuthPage() {
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup">("signup");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState(1);
