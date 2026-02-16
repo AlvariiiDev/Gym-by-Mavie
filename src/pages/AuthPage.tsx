@@ -105,7 +105,7 @@ export default function AuthPage() {
         {/* Logo */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-display font-bold neon-text text-primary">GYM by Alvari
-            <span className="text-secondary neon-text-orange">Alvari</span>
+            <span className="text-secondary neon-text-orange"></span>
           </h1>
           <p className="text-muted-foreground text-sm">Treine. Compita. Evolua.</p>
         </div>
