@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AVATARS } from "@/lib/avatars";
-import { signUpUser, signInUser, createProfile, getProfile, getProfileByUsername } from "@/lib/supabase-helpers";
+import { signUpUser, signInUser, createProfile, getProfileByUsername } from "@/lib/supabase-helpers";
 import { toast } from "sonner";
 
 export default function AuthPage() {
@@ -41,30 +41,18 @@ export default function AuthPage() {
         // Check if username taken
         const existing = await getProfileByUsername(username.trim());
         if (existing.data) {
-          toast.error("Este ID já está em uso");
+          toast.error("Este ID já está em uso. Faça login!");
+          setMode("login");
           setLoading(false);
           return;
         }
 
         const { data, error } = await signUpUser(email, password);
         if (error) {
-          // User exists in auth but maybe profile was deleted - try signing in
           if (error.message?.includes("already registered") || error.message?.includes("already exists")) {
-            const { data: loginData, error: loginError } = await signInUser(email, password);
-            if (loginError) {
-              toast.error("Este ID já existe. Verifique a senha.");
-              setLoading(false);
-              return;
-            }
-            if (loginData.user) {
-              // Recreate profile if missing
-              const { data: existingProfile } = await getProfile(loginData.user.id);
-              if (!existingProfile) {
-                await createProfile(loginData.user.id, username.trim(), selectedAvatar);
-              }
-              toast.success("Conta recuperada! Bem-vindo! 💪");
-              navigate("/workout");
-            }
+            toast.error("Este ID já está em uso. Faça login!");
+            setMode("login");
+            setLoading(false);
             return;
           }
           throw error;
@@ -76,16 +64,10 @@ export default function AuthPage() {
           navigate("/workout");
         }
       } else {
-        // For login, we need to find the email from the username
-        const profile = await getProfileByUsername(username.trim());
-        if (!profile.data) {
-          toast.error("ID não encontrado");
-          setLoading(false);
-          return;
-        }
+        // Login flow
         const { error } = await signInUser(email, password);
         if (error) {
-          toast.error("Senha incorreta");
+          toast.error("ID ou senha incorretos");
           setLoading(false);
           return;
         }
