@@ -15,14 +15,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'TOKEN_REFRESHED' && !session) {
+        // Token refresh failed - account may have been deleted
+        supabase.auth.signOut().catch(() => {});
+        setSession(null);
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+      } else {
+        setSession(session);
+      }
       setLoading(false);
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      if (s) {
+        // Validate session by refreshing - catches deleted accounts
+        supabase.auth.refreshSession().then(({ data, error }) => {
+          if (error) {
+            supabase.auth.signOut().catch(() => {});
+            setSession(null);
+          } else {
+            setSession(data.session);
+          }
+          setLoading(false);
+        });
+      } else {
+        setSession(null);
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
