@@ -10,6 +10,7 @@ import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
 import BottomNav from "./components/BottomNav";
 import RestTimer from "./components/RestTimer";
+import { RestTimerProvider } from "./hooks/useRestTimer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,7 +23,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     </div>
   );
   if (!user) return <Navigate to="/" replace />;
-  return <>{children}<BottomNav /><RestTimer /></>;
+  return <RestTimerProvider>{children}<BottomNav /><RestTimer /></RestTimerProvider>;
 }
 
 function AuthRoute() {

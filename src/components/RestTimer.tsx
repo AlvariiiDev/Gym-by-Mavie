@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";
 import { Timer, X } from "lucide-react";
+import { useRestTimer } from "@/hooks/useRestTimer";
 
 const PRESETS = [
   { label: "30s", value: 30 },
@@ -9,51 +9,11 @@ const PRESETS = [
 ];
 
 export default function RestTimer() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [seconds, setSeconds] = useState(0);
-  const [totalSeconds, setTotalSeconds] = useState(60);
-  const [isRunning, setIsRunning] = useState(false);
-  const [timerKey, setTimerKey] = useState(0);
-  const intervalRef = useRef<number | null>(null);
+  const {
+    isOpen, setIsOpen, seconds, isRunning,
+    startTimer, stopTimer, progress, presetDuration, setPresetDuration,
+  } = useRestTimer();
 
-  const stopTimer = useCallback(() => {
-    setIsRunning(false);
-    if (intervalRef.current) clearInterval(intervalRef.current);
-  }, []);
-
-  const startTimer = useCallback((duration: number) => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    setTotalSeconds(duration);
-    setSeconds(duration);
-    setIsRunning(true);
-    setTimerKey(k => k + 1);
-    setIsOpen(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isRunning) return;
-    intervalRef.current = window.setInterval(() => {
-      setSeconds(prev => {
-        if (prev <= 1) {
-          stopTimer();
-          if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300, 100, 300, 100, 300]);
-          try {
-            const ctx = new AudioContext();
-            const osc = ctx.createOscillator();
-            osc.frequency.value = 880;
-            osc.connect(ctx.destination);
-            osc.start();
-            setTimeout(() => osc.stop(), 1000);
-          } catch {}
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isRunning, timerKey, stopTimer]);
-
-  const progress = totalSeconds > 0 ? ((totalSeconds - seconds) / totalSeconds) * 100 : 0;
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
   if (!isOpen) {
@@ -84,25 +44,36 @@ export default function RestTimer() {
         {isRunning && (
           <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full gradient-primary rounded-full transition-all duration-1000"
+              className="h-full gradient-primary rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
         )}
       </div>
 
-      {/* Presets */}
+      {/* Preset selector - shows which one is the auto-start default */}
       <div className="grid grid-cols-4 gap-1.5">
         {PRESETS.map(p => (
           <button
             key={p.value}
-            onClick={() => startTimer(p.value)}
-            className="py-1.5 px-1 text-xs font-display font-medium rounded-md bg-muted hover:bg-primary hover:text-primary-foreground transition-all"
+            onClick={() => {
+              setPresetDuration(p.value);
+              startTimer(p.value);
+            }}
+            className={`py-1.5 px-1 text-xs font-display font-medium rounded-md transition-all ${
+              presetDuration === p.value && !isRunning
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted hover:bg-primary hover:text-primary-foreground"
+            }`}
           >
             {p.label}
           </button>
         ))}
       </div>
+
+      <p className="text-[10px] text-muted-foreground text-center">
+        ⏱ Auto-start ao completar série ({PRESETS.find(p => p.value === presetDuration)?.label || `${presetDuration}s`})
+      </p>
 
       {isRunning && (
         <button

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus, Trash2, ChevronDown, ChevronUp, Check, Flag, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useRestTimer } from "@/hooks/useRestTimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SetInput from "@/components/SetInput";
@@ -30,6 +31,7 @@ interface WorkoutData {
 
 export default function WorkoutPage() {
   const { user } = useAuth();
+  const { startTimer } = useRestTimer();
   const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
   const [activeWorkout, setActiveWorkout] = useState<string | null>(null);
   const [newWorkoutName, setNewWorkoutName] = useState("");
@@ -149,6 +151,8 @@ export default function WorkoutPage() {
     const updateData: any = { [field]: value };
     if (field === "completed" && value === true) {
       updateData.completed_at = new Date().toISOString();
+      // Auto-start rest timer when completing a set
+      startTimer();
     }
     await supabase.from("sets").update(updateData).eq("id", setId);
   };
