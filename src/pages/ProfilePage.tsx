@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { signOutUser } from "@/lib/supabase-helpers";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import { getRankTier, getRankLabel } from "@/lib/avatars";
+import { getRankTier, getRankLabel, getLevel } from "@/lib/avatars";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -107,13 +107,14 @@ export default function ProfilePage() {
   }
 
   const tier = getRankTier(totalWeight);
+  const level = getLevel(totalWeight);
 
   return (
     <div className="min-h-screen bg-background pb-20 pt-4 px-4">
       <div className="max-w-lg mx-auto space-y-6">
         {/* Profile card */}
         <div className="glass rounded-xl p-6 text-center space-y-4">
-          <AvatarDisplay avatarId={profile.avatar_id} size="lg" showName />
+          <AvatarDisplay avatarId={profile.avatar_id} size="lg" showName level={level} />
           <div>
             <h1 className="text-xl font-display font-bold text-foreground">{profile.username}</h1>
             <span className={`text-sm font-display font-medium ${

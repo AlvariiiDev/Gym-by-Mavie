@@ -3,7 +3,7 @@ import { Trophy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import { getRankTier, getRankLabel } from "@/lib/avatars";
+import { getRankTier, getRankLabel, getLevel } from "@/lib/avatars";
 
 interface RankedUser {
   user_id: string;
@@ -135,7 +135,7 @@ export default function RankingPage() {
                 {/* 2nd place */}
                 {ranking.length >= 2 && (
                   <div className="flex flex-col items-center">
-                    <AvatarDisplay avatarId={ranking[1].avatar_id} size="md" />
+                    <AvatarDisplay avatarId={ranking[1].avatar_id} size="md" level={getLevel(ranking[1].totalWeight)} />
                     <span className="text-xs font-display font-bold text-silver mt-1">
                       {ranking[1].username}
                     </span>
@@ -150,7 +150,7 @@ export default function RankingPage() {
 
                 {/* 1st place */}
                 <div className="flex flex-col items-center">
-                  <AvatarDisplay avatarId={ranking[0].avatar_id} size="lg" />
+                  <AvatarDisplay avatarId={ranking[0].avatar_id} size="lg" level={getLevel(ranking[0].totalWeight)} />
                   <span className="text-xs font-display font-bold text-gold mt-1 neon-text-orange">
                     {ranking[0].username}
                   </span>
@@ -165,7 +165,7 @@ export default function RankingPage() {
                 {/* 3rd place */}
                 {ranking.length >= 3 && (
                   <div className="flex flex-col items-center">
-                    <AvatarDisplay avatarId={ranking[2].avatar_id} size="sm" />
+                    <AvatarDisplay avatarId={ranking[2].avatar_id} size="sm" level={getLevel(ranking[2].totalWeight)} />
                     <span className="text-xs font-display font-bold text-bronze mt-1">
                       {ranking[2].username}
                     </span>
@@ -194,7 +194,7 @@ export default function RankingPage() {
                     <span className={`text-sm font-display font-bold w-6 text-center ${podiumColors[idx] || "text-muted-foreground"}`}>
                       {idx + 1}
                     </span>
-                    <AvatarDisplay avatarId={r.avatar_id} size="sm" />
+                    <AvatarDisplay avatarId={r.avatar_id} size="sm" level={getLevel(r.totalWeight)} />
                     <div className="flex-1">
                       <span className="text-sm font-medium">{r.username}</span>
                       <span className="text-[10px] text-muted-foreground ml-2">
