@@ -51,33 +51,27 @@ export default function RankingPage() {
       since = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     }
 
-    // Get profiles
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("*")
-      .in("user_id", userIds);
+    // Fetch profiles and sets in parallel instead of N+1
+    const [profilesRes, setsRes] = await Promise.all([
+      supabase.from("profiles").select("*").in("user_id", userIds),
+      supabase.from("sets").select("weight, reps, user_id").in("user_id", userIds).not("completed_at", "is", null).gte("completed_at", since),
+    ]);
 
-    // Get completed sets for each user
-    const ranked: RankedUser[] = [];
-    for (const uid of userIds) {
-      const { data: sets } = await supabase
-        .from("sets")
-        .select("weight, reps")
-        .eq("user_id", uid)
-        .not("completed_at", "is", null)
-        .gte("completed_at", since);
+    const profiles = profilesRes.data || [];
+    const allSets = setsRes.data || [];
 
-      const total = (sets || []).reduce((sum, s) => sum + Number(s.weight) * s.reps, 0);
-      const profile = (profiles || []).find(p => p.user_id === uid);
-      if (profile) {
-        ranked.push({
-          user_id: uid,
-          username: profile.username,
-          avatar_id: profile.avatar_id,
-          totalWeight: total,
-        });
-      }
+    // Aggregate weight per user
+    const weightByUser = new Map<string, number>();
+    for (const s of allSets) {
+      weightByUser.set(s.user_id, (weightByUser.get(s.user_id) || 0) + Number(s.weight) * s.reps);
     }
+
+    const ranked: RankedUser[] = profiles.map(p => ({
+      user_id: p.user_id,
+      username: p.username,
+      avatar_id: p.avatar_id,
+      totalWeight: weightByUser.get(p.user_id) || 0,
+    }));
 
     ranked.sort((a, b) => b.totalWeight - a.totalWeight);
     setRanking(ranked);

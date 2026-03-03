@@ -42,45 +42,40 @@ export default function WorkoutPage() {
 
   const loadWorkouts = async () => {
     if (!user) return;
-    const { data: wData } = await supabase
-      .from("workouts")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+    
+    // Fetch all data in parallel - 3 queries instead of N+1
+    const [wRes, exRes, sRes] = await Promise.all([
+      supabase.from("workouts").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("exercises").select("*").eq("user_id", user.id).order("sort_order"),
+      supabase.from("sets").select("*").eq("user_id", user.id).order("sort_order"),
+    ]);
 
-    if (!wData) { setLoading(false); return; }
+    const wData = wRes.data || [];
+    const exData = exRes.data || [];
+    const sData = sRes.data || [];
 
-    const fullWorkouts: WorkoutData[] = [];
-    for (const w of wData) {
-      const { data: exData } = await supabase
-        .from("exercises")
-        .select("*")
-        .eq("workout_id", w.id)
-        .order("sort_order");
-
-      const exercises: ExerciseData[] = [];
-      for (const ex of exData || []) {
-        const { data: sData } = await supabase
-          .from("sets")
-          .select("*")
-          .eq("exercise_id", ex.id)
-          .order("sort_order");
-
-        exercises.push({
-          id: ex.id,
-          name: ex.name,
-          sort_order: ex.sort_order,
-          sets: (sData || []).map(s => ({
-            id: s.id,
-            weight: Number(s.weight),
-            reps: s.reps,
-            completed: s.completed,
-            sort_order: s.sort_order,
-          })),
-        });
-      }
-      fullWorkouts.push({ id: w.id, name: w.name, exercises });
+    // Index sets by exercise_id
+    const setsByExercise = new Map<string, SetData[]>();
+    for (const s of sData) {
+      const arr = setsByExercise.get(s.exercise_id) || [];
+      arr.push({ id: s.id, weight: Number(s.weight), reps: s.reps, completed: s.completed, sort_order: s.sort_order });
+      setsByExercise.set(s.exercise_id, arr);
     }
+
+    // Index exercises by workout_id
+    const exercisesByWorkout = new Map<string, ExerciseData[]>();
+    for (const ex of exData) {
+      const arr = exercisesByWorkout.get(ex.workout_id) || [];
+      arr.push({ id: ex.id, name: ex.name, sort_order: ex.sort_order, sets: setsByExercise.get(ex.id) || [] });
+      exercisesByWorkout.set(ex.workout_id, arr);
+    }
+
+    const fullWorkouts: WorkoutData[] = wData.map(w => ({
+      id: w.id,
+      name: w.name,
+      exercises: exercisesByWorkout.get(w.id) || [],
+    }));
+
     setWorkouts(fullWorkouts);
     setLoading(false);
   };
