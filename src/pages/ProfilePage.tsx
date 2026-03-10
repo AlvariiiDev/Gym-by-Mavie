@@ -130,7 +130,7 @@ export default function ProfilePage() {
             </span>
           </div>
           <div className="glass rounded-lg p-3">
-            <span className="text-xs text-muted-foreground font-display">PESO TOTAL LEVANTADO</span>
+            <span className="text-xs text-muted-foreground font-display">PESO LEVANTADO NA SEMANA</span>
             <p className="text-2xl font-display font-bold text-secondary neon-text-orange">
               {totalWeight.toLocaleString()}kg
             </p>
