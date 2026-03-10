@@ -54,6 +54,23 @@ export default function WorkoutPage() {
     const exData = exRes.data || [];
     const sData = sRes.data || [];
 
+    // Auto-reset sets completed more than 10 hours ago
+    const TEN_HOURS = 10 * 60 * 60 * 1000;
+    const now = Date.now();
+    const staleSetIds: string[] = [];
+    for (const s of sData) {
+      if (s.completed && s.completed_at) {
+        const completedAt = new Date(s.completed_at).getTime();
+        if (now - completedAt > TEN_HOURS) {
+          s.completed = false;
+          staleSetIds.push(s.id);
+        }
+      }
+    }
+    if (staleSetIds.length > 0) {
+      supabase.from("sets").update({ completed: false }).in("id", staleSetIds).then(() => {});
+    }
+
     // Index sets by exercise_id
     const setsByExercise = new Map<string, SetData[]>();
     for (const s of sData) {
