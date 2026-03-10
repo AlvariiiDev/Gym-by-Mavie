@@ -21,7 +21,7 @@ export default function AvatarDisplay({ avatarId, size = "md", showName = false,
     <div className="flex flex-col items-center gap-1">
       {levelImage ? (
         <div className={`${sizeClasses[size]} rounded-full overflow-hidden neon-box`}>
-          <img src={levelImage} alt={avatar.name} className="w-full h-full object-cover object-top" />
+          <img src={levelImage} alt={avatar.name} className="w-[140%] h-[140%] object-cover object-top -ml-[20%] -mt-[5%]" />
         </div>
       ) : (
         <div className={`${sizeClasses[size]} rounded-full bg-gradient-to-br ${avatar.color} flex items-center justify-center neon-box`}>
