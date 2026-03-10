@@ -33,12 +33,18 @@ export default function ProfilePage() {
         .single();
       setProfile(p);
 
-      // Total weight all time
+      // Weekly weight (same logic as ranking)
+      const now = new Date();
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - now.getDay());
+      weekStart.setHours(0, 0, 0, 0);
+
       const { data: sets } = await supabase
         .from("sets")
         .select("weight, reps")
         .eq("user_id", user.id)
-        .eq("completed", true);
+        .not("completed_at", "is", null)
+        .gte("completed_at", weekStart.toISOString());
 
       const total = (sets || []).reduce((sum, s) => sum + Number(s.weight) * s.reps, 0);
       setTotalWeight(total);
@@ -53,7 +59,7 @@ export default function ProfilePage() {
         .from("sets")
         .select("weight, reps")
         .eq("user_id", user.id)
-        .eq("completed", true)
+        .not("completed_at", "is", null)
         .gte("completed_at", today.toISOString());
 
       if (todaySets && todaySets.length > 0) {
