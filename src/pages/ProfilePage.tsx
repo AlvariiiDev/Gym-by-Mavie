@@ -33,12 +33,18 @@ export default function ProfilePage() {
         .single();
       setProfile(p);
 
-      // Total weight all time
+      // Weekly weight (same logic as ranking)
+      const now = new Date();
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - now.getDay());
+      weekStart.setHours(0, 0, 0, 0);
+
       const { data: sets } = await supabase
         .from("sets")
         .select("weight, reps")
         .eq("user_id", user.id)
-        .eq("completed", true);
+        .not("completed_at", "is", null)
+        .gte("completed_at", weekStart.toISOString());
 
       const total = (sets || []).reduce((sum, s) => sum + Number(s.weight) * s.reps, 0);
       setTotalWeight(total);
@@ -53,7 +59,7 @@ export default function ProfilePage() {
         .from("sets")
         .select("weight, reps")
         .eq("user_id", user.id)
-        .eq("completed", true)
+        .not("completed_at", "is", null)
         .gte("completed_at", today.toISOString());
 
       if (todaySets && todaySets.length > 0) {
@@ -124,7 +130,7 @@ export default function ProfilePage() {
             </span>
           </div>
           <div className="glass rounded-lg p-3">
-            <span className="text-xs text-muted-foreground font-display">PESO TOTAL LEVANTADO</span>
+            <span className="text-xs text-muted-foreground font-display">PESO LEVANTADO NA SEMANA</span>
             <p className="text-2xl font-display font-bold text-secondary neon-text-orange">
               {totalWeight.toLocaleString()}kg
             </p>
