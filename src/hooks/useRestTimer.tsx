@@ -63,11 +63,13 @@ export function RestTimerProvider({ children }: { children: ReactNode }) {
 
   const stopTimer = useCallback(() => {
     setIsRunning(false);
+    setSeconds(0);
     endTimeRef.current = null;
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+    setIsOpen(false);
   }, []);
 
   const startTimer = useCallback((duration?: number) => {
