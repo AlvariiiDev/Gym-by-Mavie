@@ -144,22 +144,28 @@ export type Database = {
       workouts: {
         Row: {
           created_at: string
+          day_of_week: string | null
           id: string
           name: string
+          sort_order: number
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          day_of_week?: string | null
           id?: string
           name: string
+          sort_order?: number
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          day_of_week?: string | null
           id?: string
           name?: string
+          sort_order?: number
           updated_at?: string
           user_id?: string
         }
