@@ -453,28 +453,30 @@ export default function WorkoutPage() {
                     )}
 
                     {exercise.sets.map((set, idx) => (
-                      <div
-                        key={set.id}
-                        className={`grid grid-cols-[1fr_1fr_1fr_auto_auto] gap-2 items-center px-1 ${
-                          set.completed ? "opacity-60" : ""
-                        }`}
-                      >
-                        <span className="text-xs font-display text-muted-foreground">{idx + 1}</span>
-                        <SetInput value={set.weight} field="weight" onSave={(v) => updateSet(set.id, "weight", v)} />
-                        <SetInput value={set.reps} field="reps" onSave={(v) => updateSet(set.id, "reps", v)} />
-                        <button
-                          onClick={() => updateSet(set.id, "completed", !set.completed)}
-                          className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${
-                            set.completed
-                              ? "bg-success text-success-foreground"
-                              : "bg-muted border border-border hover:border-primary"
+                      <div key={set.id} className="contents">
+                        <div
+                          className={`grid grid-cols-[1fr_1fr_1fr_auto_auto] gap-2 items-center px-1 ${
+                            set.completed ? "opacity-60" : ""
                           }`}
                         >
-                          {set.completed && <Check className="w-4 h-4" />}
-                        </button>
-                        <button onClick={() => deleteSet(set.id)}>
-                          <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
-                        </button>
+                          <span className="text-xs font-display text-muted-foreground">{idx + 1}</span>
+                          <SetInput value={set.weight} field="weight" onSave={(v) => updateSet(set.id, "weight", v)} />
+                          <SetInput value={set.reps} field="reps" onSave={(v) => updateSet(set.id, "reps", v)} />
+                          <button
+                            onClick={() => updateSet(set.id, "completed", !set.completed)}
+                            className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${
+                              set.completed
+                                ? "bg-success text-success-foreground"
+                                : "bg-muted border border-border hover:border-primary"
+                            }`}
+                          >
+                            {set.completed && <Check className="w-4 h-4" />}
+                          </button>
+                          <button onClick={() => deleteSet(set.id)}>
+                            <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+                          </button>
+                        </div>
+                        <InlineRestTimer setId={set.id} />
                       </div>
                     ))}
 
