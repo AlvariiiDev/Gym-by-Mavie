@@ -9,7 +9,6 @@ import FriendsPage from "./pages/FriendsPage";
 import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
 import BottomNav from "./components/BottomNav";
-import RestTimer from "./components/RestTimer";
 import { RestTimerProvider } from "./hooks/useRestTimer";
 import NotFound from "./pages/NotFound";
 
