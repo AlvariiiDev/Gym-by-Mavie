@@ -6,6 +6,7 @@ import { useRestTimer } from "@/hooks/useRestTimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SetInput from "@/components/SetInput";
+import InlineRestTimer from "@/components/InlineRestTimer";
 import { toast } from "sonner";
 
 interface SetData {
