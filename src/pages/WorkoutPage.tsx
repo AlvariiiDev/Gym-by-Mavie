@@ -223,7 +223,7 @@ export default function WorkoutPage() {
     const updateData: any = { [field]: value };
     if (field === "completed" && value === true) {
       updateData.completed_at = new Date().toISOString();
-      startTimer();
+      startTimer(undefined, setId);
     }
     await supabase.from("sets").update(updateData).eq("id", setId);
   };
