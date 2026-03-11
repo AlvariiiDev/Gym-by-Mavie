@@ -395,14 +395,17 @@ export default function WorkoutPage() {
                 >
                   <Calendar className="w-3.5 h-3.5" />
                 </button>
-                <div className="flex items-center gap-1">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setActiveWorkout(activeWorkout === workout.id ? null : workout.id); }}
+                  className="flex items-center gap-1 p-1 rounded hover:bg-muted/50 transition-colors"
+                >
                   <span className="text-xs text-muted-foreground">{workout.exercises.length} exerc.</span>
                   {activeWorkout === workout.id ? (
                     <ChevronUp className="w-4 h-4 text-muted-foreground" />
                   ) : (
                     <ChevronDown className="w-4 h-4 text-muted-foreground" />
                   )}
-                </div>
+                </button>
               </div>
             </div>
 
