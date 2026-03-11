@@ -22,7 +22,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     </div>
   );
   if (!user) return <Navigate to="/" replace />;
-  return <RestTimerProvider>{children}<BottomNav /><RestTimer /></RestTimerProvider>;
+  return <RestTimerProvider>{children}<BottomNav /></RestTimerProvider>;
 }
 
 function AuthRoute() {
