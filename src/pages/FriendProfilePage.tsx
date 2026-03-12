@@ -41,6 +41,7 @@ export default function FriendProfilePage() {
   const [badges, setBadges] = useState<{ emoji: string; title: string; description: string }[]>([]);
   const [workoutsWithPRs, setWorkoutsWithPRs] = useState<WorkoutWithPRs[]>([]);
   const [expandedWorkout, setExpandedWorkout] = useState<string | null>(null);
+  const [chartExercise, setChartExercise] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
