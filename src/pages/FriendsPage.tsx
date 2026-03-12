@@ -1,11 +1,23 @@
 import { useState, useEffect } from "react";
-import { UserPlus, Check, X, Users } from "lucide-react";
+import { UserPlus, Check, X, Users, UserMinus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface FriendProfile {
   user_id: string;
@@ -20,6 +32,7 @@ interface FriendRequest {
 
 export default function FriendsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [friends, setFriends] = useState<FriendProfile[]>([]);
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [searchId, setSearchId] = useState("");
@@ -122,7 +135,6 @@ export default function FriendsPage() {
   };
 
   const respondRequest = async (requestId: string, accept: boolean) => {
-    // Update local state immediately
     const req = requests.find(r => r.id === requestId);
     setRequests(prev => prev.filter(r => r.id !== requestId));
     if (accept && req) {
@@ -133,6 +145,16 @@ export default function FriendsPage() {
       .from("friendships")
       .update({ status: accept ? "accepted" : "rejected" })
       .eq("id", requestId);
+  };
+
+  const removeFriend = async (friendId: string) => {
+    if (!user) return;
+    setFriends(prev => prev.filter(f => f.user_id !== friendId));
+    toast.success("Amigo removido");
+    await supabase
+      .from("friendships")
+      .delete()
+      .or(`and(requester_id.eq.${user.id},addressee_id.eq.${friendId}),and(requester_id.eq.${friendId},addressee_id.eq.${user.id})`);
   };
 
   return (
@@ -205,9 +227,38 @@ export default function FriendsPage() {
             </p>
           ) : (
             friends.map(friend => (
-              <div key={friend.user_id} className="glass rounded-xl p-3 flex items-center gap-3">
-                <AvatarDisplay avatarId={friend.avatar_id} size="sm" />
-                <span className="font-medium text-sm">{friend.username}</span>
+              <div key={friend.user_id} className="glass rounded-xl p-3 flex items-center justify-between">
+                <div
+                  className="flex items-center gap-3 flex-1 cursor-pointer"
+                  onClick={() => navigate(`/friend/${friend.user_id}`)}
+                >
+                  <AvatarDisplay avatarId={friend.avatar_id} size="sm" />
+                  <span className="font-medium text-sm">{friend.username}</span>
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="p-2 rounded-lg hover:bg-destructive/10 transition-colors">
+                      <UserMinus className="w-4 h-4 text-destructive" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="glass border-border">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="font-display">Remover amigo?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Remover <strong>{friend.username}</strong> da sua lista de amigos?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="font-display">Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => removeFriend(friend.user_id)}
+                        className="bg-destructive text-destructive-foreground font-display"
+                      >
+                        Remover
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             ))
           )}
