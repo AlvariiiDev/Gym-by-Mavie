@@ -32,6 +32,7 @@ interface FriendRequest {
 
 export default function FriendsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [friends, setFriends] = useState<FriendProfile[]>([]);
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [searchId, setSearchId] = useState("");
