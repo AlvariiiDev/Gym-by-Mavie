@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface ExercisePR {
+  id: string;
   name: string;
   maxWeight: number;
 }
