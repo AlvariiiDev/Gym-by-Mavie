@@ -195,7 +195,55 @@ export default function FriendProfilePage() {
           </div>
         )}
 
-        {/* Remove friend */}
+        {/* Workouts & PRs */}
+        {workoutsWithPRs.length > 0 && (
+          <div className="space-y-3">
+            <h2 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
+              <Dumbbell className="w-4 h-4 text-primary" /> TREINOS & PRs
+            </h2>
+            {workoutsWithPRs.map((workout) => (
+              <div key={workout.id} className="glass rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setExpandedWorkout(expandedWorkout === workout.id ? null : workout.id)}
+                  className="w-full p-3 flex items-center justify-between hover:bg-muted/30 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-display font-bold text-foreground">{workout.name}</span>
+                    {workout.day_of_week && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary font-display uppercase">
+                        {workout.day_of_week}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">{workout.exercises.length} exerc.</span>
+                    {expandedWorkout === workout.id ? (
+                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </div>
+                </button>
+                {expandedWorkout === workout.id && workout.exercises.length > 0 && (
+                  <div className="border-t border-border/50 px-3 pb-3 space-y-2 pt-2">
+                    {workout.exercises.map((ex, idx) => (
+                      <div key={idx} className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-muted/20">
+                        <span className="text-sm text-foreground">{ex.name}</span>
+                        <div className="flex items-center gap-1.5">
+                          <Trophy className="w-3.5 h-3.5 text-secondary" />
+                          <span className="text-sm font-display font-bold text-secondary neon-text-orange">
+                            {ex.maxWeight > 0 ? `${ex.maxWeight}kg` : "—"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <button className="w-full py-3 rounded-xl glass text-destructive font-display font-bold text-sm flex items-center justify-center gap-2 hover:bg-destructive/10 transition-all">
