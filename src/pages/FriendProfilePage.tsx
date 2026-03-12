@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, UserMinus, Award } from "lucide-react";
+import { ArrowLeft, UserMinus, Award, Dumbbell, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AvatarDisplay from "@/components/AvatarDisplay";
@@ -18,6 +18,18 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+interface ExercisePR {
+  name: string;
+  maxWeight: number;
+}
+
+interface WorkoutWithPRs {
+  id: string;
+  name: string;
+  day_of_week: string | null;
+  exercises: ExercisePR[];
+}
+
 export default function FriendProfilePage() {
   const { userId } = useParams<{ userId: string }>();
   const { user } = useAuth();
@@ -25,6 +37,8 @@ export default function FriendProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [totalWeight, setTotalWeight] = useState(0);
   const [badges, setBadges] = useState<{ emoji: string; title: string; description: string }[]>([]);
+  const [workoutsWithPRs, setWorkoutsWithPRs] = useState<WorkoutWithPRs[]>([]);
+  const [expandedWorkout, setExpandedWorkout] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,6 +75,48 @@ export default function FriendProfilePage() {
         earnedBadges.push({ emoji: "🔥", title: "Máquina de Ferro", description: "10 toneladas levantadas!" });
       }
       setBadges(earnedBadges);
+
+      // Load workouts with exercises and PRs
+      const { data: workouts } = await supabase
+        .from("workouts")
+        .select("id, name, day_of_week, sort_order")
+        .eq("user_id", userId)
+        .order("sort_order");
+
+      if (workouts && workouts.length > 0) {
+        const { data: exercises } = await supabase
+          .from("exercises")
+          .select("id, name, workout_id, sort_order")
+          .in("workout_id", workouts.map(w => w.id))
+          .order("sort_order");
+
+        const { data: allSets } = await supabase
+          .from("sets")
+          .select("exercise_id, weight")
+          .eq("user_id", userId)
+          .not("completed_at", "is", null);
+
+        const prMap = new Map<string, number>();
+        (allSets || []).forEach(s => {
+          const w = Number(s.weight);
+          const current = prMap.get(s.exercise_id) || 0;
+          if (w > current) prMap.set(s.exercise_id, w);
+        });
+
+        const result: WorkoutWithPRs[] = workouts.map(w => ({
+          id: w.id,
+          name: w.name,
+          day_of_week: w.day_of_week,
+          exercises: (exercises || [])
+            .filter(e => e.workout_id === w.id)
+            .map(e => ({
+              name: e.name,
+              maxWeight: prMap.get(e.id) || 0,
+            })),
+        }));
+        setWorkoutsWithPRs(result);
+      }
+
       setLoading(false);
     };
     load();
