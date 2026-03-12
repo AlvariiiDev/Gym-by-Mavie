@@ -8,6 +8,7 @@ import WorkoutPage from "./pages/WorkoutPage";
 import FriendsPage from "./pages/FriendsPage";
 import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
+import FriendProfilePage from "./pages/FriendProfilePage";
 import BottomNav from "./components/BottomNav";
 import { RestTimerProvider } from "./hooks/useRestTimer";
 import NotFound from "./pages/NotFound";
