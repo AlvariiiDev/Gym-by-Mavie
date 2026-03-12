@@ -227,9 +227,38 @@ export default function FriendsPage() {
             </p>
           ) : (
             friends.map(friend => (
-              <div key={friend.user_id} className="glass rounded-xl p-3 flex items-center gap-3">
-                <AvatarDisplay avatarId={friend.avatar_id} size="sm" />
-                <span className="font-medium text-sm">{friend.username}</span>
+              <div key={friend.user_id} className="glass rounded-xl p-3 flex items-center justify-between">
+                <div
+                  className="flex items-center gap-3 flex-1 cursor-pointer"
+                  onClick={() => navigate(`/friend/${friend.user_id}`)}
+                >
+                  <AvatarDisplay avatarId={friend.avatar_id} size="sm" />
+                  <span className="font-medium text-sm">{friend.username}</span>
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="p-2 rounded-lg hover:bg-destructive/10 transition-colors">
+                      <UserMinus className="w-4 h-4 text-destructive" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="glass border-border">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="font-display">Remover amigo?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Remover <strong>{friend.username}</strong> da sua lista de amigos?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="font-display">Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => removeFriend(friend.user_id)}
+                        className="bg-destructive text-destructive-foreground font-display"
+                      >
+                        Remover
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             ))
           )}
