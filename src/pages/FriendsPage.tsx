@@ -135,7 +135,6 @@ export default function FriendsPage() {
   };
 
   const respondRequest = async (requestId: string, accept: boolean) => {
-    // Update local state immediately
     const req = requests.find(r => r.id === requestId);
     setRequests(prev => prev.filter(r => r.id !== requestId));
     if (accept && req) {
@@ -146,6 +145,16 @@ export default function FriendsPage() {
       .from("friendships")
       .update({ status: accept ? "accepted" : "rejected" })
       .eq("id", requestId);
+  };
+
+  const removeFriend = async (friendId: string) => {
+    if (!user) return;
+    setFriends(prev => prev.filter(f => f.user_id !== friendId));
+    toast.success("Amigo removido");
+    await supabase
+      .from("friendships")
+      .delete()
+      .or(`and(requester_id.eq.${user.id},addressee_id.eq.${friendId}),and(requester_id.eq.${friendId},addressee_id.eq.${user.id})`);
   };
 
   return (
