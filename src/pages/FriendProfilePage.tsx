@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, UserMinus, Award, Dumbbell, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, UserMinus, Award, Dumbbell, Trophy, ChevronDown, ChevronUp, TrendingUp } from "lucide-react";
+import PRHistoryChart from "@/components/PRHistoryChart";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AvatarDisplay from "@/components/AvatarDisplay";
