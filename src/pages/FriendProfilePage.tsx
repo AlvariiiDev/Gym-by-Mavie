@@ -231,14 +231,27 @@ export default function FriendProfilePage() {
                 {expandedWorkout === workout.id && workout.exercises.length > 0 && (
                   <div className="border-t border-border/50 px-3 pb-3 space-y-2 pt-2">
                     {workout.exercises.map((ex, idx) => (
-                      <div key={idx} className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-muted/20">
-                        <span className="text-sm text-foreground">{ex.name}</span>
-                        <div className="flex items-center gap-1.5">
-                          <Trophy className="w-3.5 h-3.5 text-secondary" />
-                          <span className="text-sm font-display font-bold text-secondary neon-text-orange">
-                            {ex.maxWeight > 0 ? `${ex.maxWeight}kg` : "—"}
-                          </span>
-                        </div>
+                      <div key={idx} className="space-y-0">
+                        <button
+                          onClick={() => setChartExercise(chartExercise === ex.id ? null : ex.id)}
+                          className="w-full flex items-center justify-between py-1.5 px-2 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors"
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm text-foreground">{ex.name}</span>
+                            {ex.maxWeight > 0 && (
+                              <TrendingUp className={`w-3 h-3 transition-colors ${chartExercise === ex.id ? 'text-primary' : 'text-muted-foreground/50'}`} />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Trophy className="w-3.5 h-3.5 text-secondary" />
+                            <span className="text-sm font-display font-bold text-secondary neon-text-orange">
+                              {ex.maxWeight > 0 ? `${ex.maxWeight}kg` : "—"}
+                            </span>
+                          </div>
+                        </button>
+                        {chartExercise === ex.id && userId && (
+                          <PRHistoryChart userId={userId} exerciseId={ex.id} exerciseName={ex.name} />
+                        )}
                       </div>
                     ))}
                   </div>
