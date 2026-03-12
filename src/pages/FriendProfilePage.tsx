@@ -112,6 +112,7 @@ export default function FriendProfilePage() {
           exercises: (exercises || [])
             .filter(e => e.workout_id === w.id)
             .map(e => ({
+              id: e.id,
               name: e.name,
               maxWeight: prMap.get(e.id) || 0,
             })),
