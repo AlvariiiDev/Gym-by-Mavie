@@ -51,19 +51,27 @@ export default function RankingPage() {
       since = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     }
 
-    // Fetch profiles and sets in parallel instead of N+1
-    const [profilesRes, setsRes] = await Promise.all([
+    // Fetch profiles, period sets, and all-time sets in parallel
+    const [profilesRes, setsRes, allTimeSetsRes] = await Promise.all([
       supabase.from("profiles").select("*").in("user_id", userIds),
       supabase.from("sets").select("weight, reps, user_id").in("user_id", userIds).not("completed_at", "is", null).gte("completed_at", since),
+      supabase.from("sets").select("weight, reps, user_id").in("user_id", userIds).not("completed_at", "is", null),
     ]);
 
     const profiles = profilesRes.data || [];
     const allSets = setsRes.data || [];
+    const allTimeSets = allTimeSetsRes.data || [];
 
-    // Aggregate weight per user
+    // Aggregate weight per user (period)
     const weightByUser = new Map<string, number>();
     for (const s of allSets) {
       weightByUser.set(s.user_id, (weightByUser.get(s.user_id) || 0) + Number(s.weight) * s.reps);
+    }
+
+    // Aggregate all-time weight per user (for avatar level)
+    const allTimeWeightByUser = new Map<string, number>();
+    for (const s of allTimeSets) {
+      allTimeWeightByUser.set(s.user_id, (allTimeWeightByUser.get(s.user_id) || 0) + Number(s.weight) * s.reps);
     }
 
     const ranked: RankedUser[] = profiles.map(p => ({
@@ -71,6 +79,7 @@ export default function RankingPage() {
       username: p.username,
       avatar_id: p.avatar_id,
       totalWeight: weightByUser.get(p.user_id) || 0,
+      allTimeWeight: allTimeWeightByUser.get(p.user_id) || 0,
     }));
 
     ranked.sort((a, b) => b.totalWeight - a.totalWeight);
