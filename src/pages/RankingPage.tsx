@@ -10,6 +10,7 @@ interface RankedUser {
   username: string;
   avatar_id: number;
   totalWeight: number;
+  allTimeWeight: number;
 }
 
 type Period = "daily" | "weekly" | "monthly";
@@ -51,19 +52,27 @@ export default function RankingPage() {
       since = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     }
 
-    // Fetch profiles and sets in parallel instead of N+1
-    const [profilesRes, setsRes] = await Promise.all([
+    // Fetch profiles, period sets, and all-time sets in parallel
+    const [profilesRes, setsRes, allTimeSetsRes] = await Promise.all([
       supabase.from("profiles").select("*").in("user_id", userIds),
       supabase.from("sets").select("weight, reps, user_id").in("user_id", userIds).not("completed_at", "is", null).gte("completed_at", since),
+      supabase.from("sets").select("weight, reps, user_id").in("user_id", userIds).not("completed_at", "is", null),
     ]);
 
     const profiles = profilesRes.data || [];
     const allSets = setsRes.data || [];
+    const allTimeSets = allTimeSetsRes.data || [];
 
-    // Aggregate weight per user
+    // Aggregate weight per user (period)
     const weightByUser = new Map<string, number>();
     for (const s of allSets) {
       weightByUser.set(s.user_id, (weightByUser.get(s.user_id) || 0) + Number(s.weight) * s.reps);
+    }
+
+    // Aggregate all-time weight per user (for avatar level)
+    const allTimeWeightByUser = new Map<string, number>();
+    for (const s of allTimeSets) {
+      allTimeWeightByUser.set(s.user_id, (allTimeWeightByUser.get(s.user_id) || 0) + Number(s.weight) * s.reps);
     }
 
     const ranked: RankedUser[] = profiles.map(p => ({
@@ -71,6 +80,7 @@ export default function RankingPage() {
       username: p.username,
       avatar_id: p.avatar_id,
       totalWeight: weightByUser.get(p.user_id) || 0,
+      allTimeWeight: allTimeWeightByUser.get(p.user_id) || 0,
     }));
 
     ranked.sort((a, b) => b.totalWeight - a.totalWeight);
@@ -129,7 +139,7 @@ export default function RankingPage() {
                 {/* 2nd place */}
                 {ranking.length >= 2 && (
                   <div className="flex flex-col items-center">
-                    <AvatarDisplay avatarId={ranking[1].avatar_id} size="md" level={getLevel(ranking[1].totalWeight)} />
+                    <AvatarDisplay avatarId={ranking[1].avatar_id} size="md" level={getLevel(ranking[1].allTimeWeight)} />
                     <span className="text-xs font-display font-bold text-silver mt-1">
                       {ranking[1].username}
                     </span>
@@ -144,7 +154,7 @@ export default function RankingPage() {
 
                 {/* 1st place */}
                 <div className="flex flex-col items-center">
-                  <AvatarDisplay avatarId={ranking[0].avatar_id} size="lg" level={getLevel(ranking[0].totalWeight)} />
+                  <AvatarDisplay avatarId={ranking[0].avatar_id} size="lg" level={getLevel(ranking[0].allTimeWeight)} />
                   <span className="text-xs font-display font-bold text-gold mt-1 neon-text-orange">
                     {ranking[0].username}
                   </span>
@@ -159,7 +169,7 @@ export default function RankingPage() {
                 {/* 3rd place */}
                 {ranking.length >= 3 && (
                   <div className="flex flex-col items-center">
-                    <AvatarDisplay avatarId={ranking[2].avatar_id} size="sm" level={getLevel(ranking[2].totalWeight)} />
+                    <AvatarDisplay avatarId={ranking[2].avatar_id} size="sm" level={getLevel(ranking[2].allTimeWeight)} />
                     <span className="text-xs font-display font-bold text-bronze mt-1">
                       {ranking[2].username}
                     </span>
@@ -188,7 +198,7 @@ export default function RankingPage() {
                     <span className={`text-sm font-display font-bold w-6 text-center ${podiumColors[idx] || "text-muted-foreground"}`}>
                       {idx + 1}
                     </span>
-                    <AvatarDisplay avatarId={r.avatar_id} size="sm" level={getLevel(r.totalWeight)} />
+                    <AvatarDisplay avatarId={r.avatar_id} size="sm" level={getLevel(r.allTimeWeight)} />
                     <div className="flex-1">
                       <span className="text-sm font-medium">{r.username}</span>
                       <span className="text-[10px] text-muted-foreground ml-2">
