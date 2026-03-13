@@ -44,7 +44,7 @@ const DAYS_OF_WEEK = [
 
 export default function WorkoutPage() {
   const { user } = useAuth();
-  const { startTimer } = useRestTimer();
+  const { startTimer, stopTimer, isRunning, activeSetId } = useRestTimer();
   const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
   const [activeWorkout, setActiveWorkout] = useState<string | null>(null);
   const [newWorkoutName, setNewWorkoutName] = useState("");
