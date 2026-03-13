@@ -154,7 +154,7 @@ export default function RankingPage() {
 
                 {/* 1st place */}
                 <div className="flex flex-col items-center">
-                  <AvatarDisplay avatarId={ranking[0].avatar_id} size="lg" level={getLevel(ranking[0].totalWeight)} />
+                  <AvatarDisplay avatarId={ranking[0].avatar_id} size="lg" level={getLevel(ranking[0].allTimeWeight)} />
                   <span className="text-xs font-display font-bold text-gold mt-1 neon-text-orange">
                     {ranking[0].username}
                   </span>
