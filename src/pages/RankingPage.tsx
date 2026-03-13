@@ -169,7 +169,7 @@ export default function RankingPage() {
                 {/* 3rd place */}
                 {ranking.length >= 3 && (
                   <div className="flex flex-col items-center">
-                    <AvatarDisplay avatarId={ranking[2].avatar_id} size="sm" level={getLevel(ranking[2].totalWeight)} />
+                    <AvatarDisplay avatarId={ranking[2].avatar_id} size="sm" level={getLevel(ranking[2].allTimeWeight)} />
                     <span className="text-xs font-display font-bold text-bronze mt-1">
                       {ranking[2].username}
                     </span>
