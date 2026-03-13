@@ -10,6 +10,7 @@ interface RankedUser {
   username: string;
   avatar_id: number;
   totalWeight: number;
+  allTimeWeight: number;
 }
 
 type Period = "daily" | "weekly" | "monthly";
