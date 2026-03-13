@@ -44,7 +44,7 @@ const DAYS_OF_WEEK = [
 
 export default function WorkoutPage() {
   const { user } = useAuth();
-  const { startTimer } = useRestTimer();
+  const { startTimer, stopTimer, isRunning, activeSetId } = useRestTimer();
   const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
   const [activeWorkout, setActiveWorkout] = useState<string | null>(null);
   const [newWorkoutName, setNewWorkoutName] = useState("");
@@ -223,7 +223,14 @@ export default function WorkoutPage() {
     const updateData: any = { [field]: value };
     if (field === "completed" && value === true) {
       updateData.completed_at = new Date().toISOString();
-      startTimer(undefined, setId);
+      if (!isRunning) {
+        startTimer(undefined, setId);
+      }
+    }
+    if (field === "completed" && value === false) {
+      if (activeSetId === setId) {
+        stopTimer();
+      }
     }
     await supabase.from("sets").update(updateData).eq("id", setId);
   };
