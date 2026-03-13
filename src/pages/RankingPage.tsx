@@ -198,7 +198,7 @@ export default function RankingPage() {
                     <span className={`text-sm font-display font-bold w-6 text-center ${podiumColors[idx] || "text-muted-foreground"}`}>
                       {idx + 1}
                     </span>
-                    <AvatarDisplay avatarId={r.avatar_id} size="sm" level={getLevel(r.totalWeight)} />
+                    <AvatarDisplay avatarId={r.avatar_id} size="sm" level={getLevel(r.allTimeWeight)} />
                     <div className="flex-1">
                       <span className="text-sm font-medium">{r.username}</span>
                       <span className="text-[10px] text-muted-foreground ml-2">
