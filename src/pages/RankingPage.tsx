@@ -170,7 +170,7 @@ export default function RankingPage() {
 
                 {/* 3rd place */}
                 {ranking.length >= 3 && (
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center cursor-pointer" onClick={() => ranking[2].user_id !== user?.id && navigate(`/friend/${ranking[2].user_id}`)}>
                     <AvatarDisplay avatarId={ranking[2].avatar_id} size="sm" level={getLevel(ranking[2].allTimeWeight)} />
                     <span className="text-xs font-display font-bold text-bronze mt-1">
                       {ranking[2].username}
