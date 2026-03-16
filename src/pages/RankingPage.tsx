@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Trophy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AvatarDisplay from "@/components/AvatarDisplay";
@@ -16,6 +17,7 @@ interface RankedUser {
 type Period = "daily" | "weekly" | "monthly";
 
 export default function RankingPage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [period, setPeriod] = useState<Period>("daily");
   const [ranking, setRanking] = useState<RankedUser[]>([]);
@@ -138,7 +140,7 @@ export default function RankingPage() {
               <div className="flex items-end justify-center gap-4 py-4">
                 {/* 2nd place */}
                 {ranking.length >= 2 && (
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center cursor-pointer" onClick={() => ranking[1].user_id !== user?.id && navigate(`/friend/${ranking[1].user_id}`)}>
                     <AvatarDisplay avatarId={ranking[1].avatar_id} size="md" level={getLevel(ranking[1].allTimeWeight)} />
                     <span className="text-xs font-display font-bold text-silver mt-1">
                       {ranking[1].username}
@@ -153,7 +155,7 @@ export default function RankingPage() {
                 )}
 
                 {/* 1st place */}
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center cursor-pointer" onClick={() => ranking[0].user_id !== user?.id && navigate(`/friend/${ranking[0].user_id}`)}>
                   <AvatarDisplay avatarId={ranking[0].avatar_id} size="lg" level={getLevel(ranking[0].allTimeWeight)} />
                   <span className="text-xs font-display font-bold text-gold mt-1 neon-text-orange">
                     {ranking[0].username}
@@ -168,7 +170,7 @@ export default function RankingPage() {
 
                 {/* 3rd place */}
                 {ranking.length >= 3 && (
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center cursor-pointer" onClick={() => ranking[2].user_id !== user?.id && navigate(`/friend/${ranking[2].user_id}`)}>
                     <AvatarDisplay avatarId={ranking[2].avatar_id} size="sm" level={getLevel(ranking[2].allTimeWeight)} />
                     <span className="text-xs font-display font-bold text-bronze mt-1">
                       {ranking[2].username}
@@ -191,8 +193,9 @@ export default function RankingPage() {
                 return (
                   <div
                     key={r.user_id}
+                    onClick={() => r.user_id !== user?.id && navigate(`/friend/${r.user_id}`)}
                     className={`glass rounded-xl p-3 flex items-center gap-3 ${
-                      r.user_id === user?.id ? "ring-1 ring-primary neon-box" : ""
+                      r.user_id === user?.id ? "ring-1 ring-primary neon-box" : "cursor-pointer active:scale-[0.98] transition-transform"
                     }`}
                   >
                     <span className={`text-sm font-display font-bold w-6 text-center ${podiumColors[idx] || "text-muted-foreground"}`}>
