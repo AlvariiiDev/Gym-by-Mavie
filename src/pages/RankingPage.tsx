@@ -140,7 +140,7 @@ export default function RankingPage() {
               <div className="flex items-end justify-center gap-4 py-4">
                 {/* 2nd place */}
                 {ranking.length >= 2 && (
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center cursor-pointer" onClick={() => ranking[1].user_id !== user?.id && navigate(`/friend/${ranking[1].user_id}`)}>
                     <AvatarDisplay avatarId={ranking[1].avatar_id} size="md" level={getLevel(ranking[1].allTimeWeight)} />
                     <span className="text-xs font-display font-bold text-silver mt-1">
                       {ranking[1].username}
