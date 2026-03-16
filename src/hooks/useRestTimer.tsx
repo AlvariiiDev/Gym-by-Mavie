@@ -97,7 +97,7 @@ export function RestTimerProvider({ children }: { children: ReactNode }) {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isRunning, stopTimer]);
+  }, [isRunning, stopTimer, timerKey]);
 
   useEffect(() => {
     const handleVisibility = () => {
