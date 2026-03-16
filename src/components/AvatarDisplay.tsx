@@ -30,7 +30,7 @@ export default function AvatarDisplay({ avatarId, size = "md", showName = false,
       )}
       {showName && (
         <span className="text-xs text-muted-foreground font-medium">
-          {avatar.name} {levelImage && <span className="text-primary">Lv.{level}</span>}
+          {avatar.name} <span className="text-primary">Lv.{level}</span>
         </span>
       )}
     </div>
