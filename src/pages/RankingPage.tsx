@@ -155,7 +155,7 @@ export default function RankingPage() {
                 )}
 
                 {/* 1st place */}
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center cursor-pointer" onClick={() => ranking[0].user_id !== user?.id && navigate(`/friend/${ranking[0].user_id}`)}>
                   <AvatarDisplay avatarId={ranking[0].avatar_id} size="lg" level={getLevel(ranking[0].allTimeWeight)} />
                   <span className="text-xs font-display font-bold text-gold mt-1 neon-text-orange">
                     {ranking[0].username}
