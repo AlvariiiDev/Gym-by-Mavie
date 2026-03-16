@@ -51,9 +51,7 @@ export default function InlineRestTimer({ setId }: InlineRestTimerProps) {
             key={p.value}
             onClick={() => {
               setPresetDuration(p.value);
-              if (!isRunning) {
-                startTimer(p.value, setId);
-              }
+              startTimer(p.value, setId);
             }}
             className={`flex-1 py-1 text-[10px] font-display font-bold rounded-md transition-all ${
               presetDuration === p.value
