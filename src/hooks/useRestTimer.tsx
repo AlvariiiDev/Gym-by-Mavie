@@ -53,6 +53,7 @@ export function RestTimerProvider({ children }: { children: ReactNode }) {
   const [totalSeconds, setTotalSeconds] = useState(60);
   const [presetDuration, setPresetDuration] = useState(60);
   const [activeSetId, setActiveSetId] = useState<string | null>(null);
+  const [timerKey, setTimerKey] = useState(0);
   const endTimeRef = useRef<number | null>(null);
   const intervalRef = useRef<number | null>(null);
 
@@ -75,6 +76,7 @@ export function RestTimerProvider({ children }: { children: ReactNode }) {
     endTimeRef.current = Date.now() + dur * 1000;
     setIsRunning(true);
     setActiveSetId(setId ?? null);
+    setTimerKey(k => k + 1);
   }, [presetDuration]);
 
   useEffect(() => {
@@ -95,7 +97,7 @@ export function RestTimerProvider({ children }: { children: ReactNode }) {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isRunning, stopTimer]);
+  }, [isRunning, stopTimer, timerKey]);
 
   useEffect(() => {
     const handleVisibility = () => {
