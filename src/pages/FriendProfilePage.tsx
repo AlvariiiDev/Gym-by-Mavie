@@ -56,16 +56,14 @@ export default function FriendProfilePage() {
       setProfile(p);
 
       const now = new Date();
-      const weekStart = new Date(now);
-      weekStart.setDate(now.getDate() - now.getDay());
-      weekStart.setHours(0, 0, 0, 0);
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
       const { data: sets } = await supabase
         .from("sets")
         .select("weight, reps")
         .eq("user_id", userId)
         .not("completed_at", "is", null)
-        .gte("completed_at", weekStart.toISOString());
+        .gte("completed_at", monthStart.toISOString());
 
       const total = (sets || []).reduce((sum, s) => sum + Number(s.weight) * s.reps, 0);
       setTotalWeight(total);
@@ -174,7 +172,7 @@ export default function FriendProfilePage() {
             </span>
           </div>
           <div className="glass rounded-lg p-3">
-            <span className="text-xs text-muted-foreground font-display">PESO LEVANTADO NA SEMANA</span>
+            <span className="text-xs text-muted-foreground font-display">PESO LEVANTADO NO MÊS</span>
             <p className="text-2xl font-display font-bold text-secondary neon-text-orange">
               {totalWeight.toLocaleString()}kg
             </p>
