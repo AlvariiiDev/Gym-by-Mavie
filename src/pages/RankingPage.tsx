@@ -193,8 +193,9 @@ export default function RankingPage() {
                 return (
                   <div
                     key={r.user_id}
+                    onClick={() => r.user_id !== user?.id && navigate(`/friend/${r.user_id}`)}
                     className={`glass rounded-xl p-3 flex items-center gap-3 ${
-                      r.user_id === user?.id ? "ring-1 ring-primary neon-box" : ""
+                      r.user_id === user?.id ? "ring-1 ring-primary neon-box" : "cursor-pointer active:scale-[0.98] transition-transform"
                     }`}
                   >
                     <span className={`text-sm font-display font-bold w-6 text-center ${podiumColors[idx] || "text-muted-foreground"}`}>
