@@ -223,9 +223,7 @@ export default function WorkoutPage() {
     const updateData: any = { [field]: value };
     if (field === "completed" && value === true) {
       updateData.completed_at = new Date().toISOString();
-      if (!isRunning) {
-        startTimer(undefined, setId);
-      }
+      startTimer(undefined, setId);
     }
     if (field === "completed" && value === false) {
       if (activeSetId === setId) {
