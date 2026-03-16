@@ -17,6 +17,7 @@ interface RankedUser {
 type Period = "daily" | "weekly" | "monthly";
 
 export default function RankingPage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [period, setPeriod] = useState<Period>("daily");
   const [ranking, setRanking] = useState<RankedUser[]>([]);
