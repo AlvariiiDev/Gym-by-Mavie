@@ -8,6 +8,16 @@ import lutador7 from "@/assets/avatars/lutador_espinhoso_7.png";
 import lutador8 from "@/assets/avatars/lutador_espinhoso_8.png";
 import lutador9 from "@/assets/avatars/lutador_espinhoso_9.png";
 import lutador10 from "@/assets/avatars/lutador_espinhoso_10.png";
+import pirata1 from "@/assets/avatars/pirata_saltitante_1.png";
+import pirata2 from "@/assets/avatars/pirata_saltitante_2.png";
+import pirata3 from "@/assets/avatars/pirata_saltitante_3.png";
+import pirata4 from "@/assets/avatars/pirata_saltitante_4.png";
+import pirata5 from "@/assets/avatars/pirata_saltitante_5.png";
+import pirata6 from "@/assets/avatars/pirata_saltitante_6.png";
+import pirata7 from "@/assets/avatars/pirata_saltitante_7.png";
+import pirata8 from "@/assets/avatars/pirata_saltitante_8.png";
+import pirata9 from "@/assets/avatars/pirata_saltitante_9.png";
+import pirata10 from "@/assets/avatars/pirata_saltitante_10.png";
 
 export interface AvatarOption {
   id: number;
@@ -18,6 +28,7 @@ export interface AvatarOption {
 }
 
 const LUTADOR_IMAGES = [lutador1, lutador2, lutador3, lutador4, lutador5, lutador6, lutador7, lutador8, lutador9, lutador10];
+const PIRATA_IMAGES = [pirata1, pirata2, pirata3, pirata4, pirata5, pirata6, pirata7, pirata8, pirata9, pirata10];
 
 export const AVATARS: AvatarOption[] = [
   { id: 1, name: "Lutador Espetado", emoji: "🔥", color: "from-red-500 to-orange-500", levelImages: LUTADOR_IMAGES },
@@ -25,7 +36,7 @@ export const AVATARS: AvatarOption[] = [
   { id: 3, name: "Guerreiro Selvagem", emoji: "⚔️", color: "from-amber-600 to-red-600" },
   { id: 4, name: "Mago Musculoso", emoji: "🧙", color: "from-violet-500 to-purple-700" },
   { id: 5, name: "Cavaleiro Fitness", emoji: "🛡️", color: "from-slate-400 to-slate-600" },
-  { id: 6, name: "Pirata Saltitante", emoji: "🏴‍☠️", color: "from-yellow-500 to-amber-700" },
+  { id: 6, name: "Pirata Saltitante", emoji: "🏴‍☠️", color: "from-yellow-500 to-amber-700", levelImages: PIRATA_IMAGES },
   { id: 7, name: "Herói Mascarado", emoji: "🦸", color: "from-blue-500 to-cyan-500" },
   { id: 8, name: "Samurai Determinado", emoji: "⛩️", color: "from-red-700 to-rose-500" },
   { id: 9, name: "Cientista Maluco", emoji: "🧪", color: "from-green-400 to-emerald-600" },
