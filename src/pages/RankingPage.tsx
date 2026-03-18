@@ -54,16 +54,19 @@ export default function RankingPage() {
       since = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     }
 
-    // Fetch profiles, period sets, and all-time sets in parallel
-    const [profilesRes, setsRes, allTimeSetsRes] = await Promise.all([
+    // Monthly start for avatar level calculation
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+    // Fetch profiles, period sets, and monthly sets in parallel
+    const [profilesRes, setsRes, monthlySetsRes] = await Promise.all([
       supabase.from("profiles").select("*").in("user_id", userIds),
       supabase.from("sets").select("weight, reps, user_id").in("user_id", userIds).not("completed_at", "is", null).gte("completed_at", since),
-      supabase.from("sets").select("weight, reps, user_id").in("user_id", userIds).not("completed_at", "is", null),
+      supabase.from("sets").select("weight, reps, user_id").in("user_id", userIds).not("completed_at", "is", null).gte("completed_at", monthStart),
     ]);
 
     const profiles = profilesRes.data || [];
     const allSets = setsRes.data || [];
-    const allTimeSets = allTimeSetsRes.data || [];
+    const monthlySets = monthlySetsRes.data || [];
 
     // Aggregate weight per user (period)
     const weightByUser = new Map<string, number>();
@@ -71,10 +74,10 @@ export default function RankingPage() {
       weightByUser.set(s.user_id, (weightByUser.get(s.user_id) || 0) + Number(s.weight) * s.reps);
     }
 
-    // Aggregate all-time weight per user (for avatar level)
-    const allTimeWeightByUser = new Map<string, number>();
-    for (const s of allTimeSets) {
-      allTimeWeightByUser.set(s.user_id, (allTimeWeightByUser.get(s.user_id) || 0) + Number(s.weight) * s.reps);
+    // Aggregate monthly weight per user (for avatar level)
+    const monthlyWeightByUser = new Map<string, number>();
+    for (const s of monthlySets) {
+      monthlyWeightByUser.set(s.user_id, (monthlyWeightByUser.get(s.user_id) || 0) + Number(s.weight) * s.reps);
     }
 
     const ranked: RankedUser[] = profiles.map(p => ({
