@@ -85,7 +85,7 @@ export default function RankingPage() {
       username: p.username,
       avatar_id: p.avatar_id,
       totalWeight: weightByUser.get(p.user_id) || 0,
-      allTimeWeight: allTimeWeightByUser.get(p.user_id) || 0,
+      allTimeWeight: monthlyWeightByUser.get(p.user_id) || 0,
     }));
 
     ranked.sort((a, b) => b.totalWeight - a.totalWeight);
