@@ -451,9 +451,28 @@ export default function WorkoutPage() {
                   <div key={exercise.id} className="bg-muted/50 rounded-lg p-3 space-y-2">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-sm text-foreground">{exercise.name}</h3>
-                      <button onClick={() => deleteExercise(exercise.id)}>
-                        <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <Timer className="w-3 h-3 text-muted-foreground" />
+                          <select
+                            value={exercise.rest_seconds}
+                            onChange={(e) => updateExerciseRest(exercise.id, Number(e.target.value))}
+                            className="bg-transparent text-[10px] font-display font-bold text-primary border border-border rounded px-1 py-0.5 focus:outline-none focus:border-primary"
+                          >
+                            <option value={15}>15s</option>
+                            <option value={30}>30s</option>
+                            <option value={45}>45s</option>
+                            <option value={60}>1:00</option>
+                            <option value={90}>1:30</option>
+                            <option value={120}>2:00</option>
+                            <option value={150}>2:30</option>
+                            <option value={180}>3:00</option>
+                          </select>
+                        </div>
+                        <button onClick={() => deleteExercise(exercise.id)}>
+                          <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
+                      </div>
                     </div>
 
                     {exercise.sets.length > 0 && (
@@ -477,7 +496,7 @@ export default function WorkoutPage() {
                           <SetInput value={set.weight} field="weight" onSave={(v) => updateSet(set.id, "weight", v)} />
                           <SetInput value={set.reps} field="reps" onSave={(v) => updateSet(set.id, "reps", v)} />
                           <button
-                            onClick={() => updateSet(set.id, "completed", !set.completed)}
+                            onClick={() => updateSet(set.id, "completed", !set.completed, exercise.rest_seconds)}
                             className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${
                               set.completed
                                 ? "bg-success text-success-foreground"
