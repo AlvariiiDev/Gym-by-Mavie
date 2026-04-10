@@ -98,7 +98,7 @@ export default function WorkoutPage() {
     const exercisesByWorkout = new Map<string, ExerciseData[]>();
     for (const ex of exData) {
       const arr = exercisesByWorkout.get(ex.workout_id) || [];
-      arr.push({ id: ex.id, name: ex.name, sort_order: ex.sort_order, sets: setsByExercise.get(ex.id) || [] });
+      arr.push({ id: ex.id, name: ex.name, sort_order: ex.sort_order, rest_seconds: (ex as any).rest_seconds ?? 60, sets: setsByExercise.get(ex.id) || [] });
       exercisesByWorkout.set(ex.workout_id, arr);
     }
 
@@ -188,7 +188,7 @@ export default function WorkoutPage() {
     if (error || !data) { toast.error("Erro ao adicionar exercício"); return; }
     setWorkouts(prev => prev.map(w => w.id === workoutId ? {
       ...w,
-      exercises: [...w.exercises, { id: data.id, name: data.name, sort_order: data.sort_order, sets: [] }],
+      exercises: [...w.exercises, { id: data.id, name: data.name, sort_order: data.sort_order, rest_seconds: (data as any).rest_seconds ?? 60, sets: [] }],
     } : w));
   };
 
