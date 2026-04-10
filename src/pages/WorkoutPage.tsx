@@ -213,7 +213,7 @@ export default function WorkoutPage() {
     })));
   };
 
-  const updateSet = async (setId: string, field: string, value: any) => {
+  const updateSet = async (setId: string, field: string, value: any, exerciseRestSeconds?: number) => {
     setWorkouts(prev => prev.map(w => ({
       ...w,
       exercises: w.exercises.map(ex => ({
@@ -224,7 +224,7 @@ export default function WorkoutPage() {
     const updateData: any = { [field]: value };
     if (field === "completed" && value === true) {
       updateData.completed_at = new Date().toISOString();
-      startTimer(undefined, setId);
+      startTimer(exerciseRestSeconds ?? 60, setId);
     }
     if (field === "completed" && value === false) {
       if (activeSetId === setId) {
@@ -232,6 +232,14 @@ export default function WorkoutPage() {
       }
     }
     await supabase.from("sets").update(updateData).eq("id", setId);
+  };
+
+  const updateExerciseRest = async (exerciseId: string, restSeconds: number) => {
+    setWorkouts(prev => prev.map(w => ({
+      ...w,
+      exercises: w.exercises.map(ex => ex.id === exerciseId ? { ...ex, rest_seconds: restSeconds } : ex),
+    })));
+    await supabase.from("exercises").update({ rest_seconds: restSeconds } as any).eq("id", exerciseId);
   };
 
   const deleteSet = async (setId: string) => {
