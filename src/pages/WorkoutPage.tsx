@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Plus, Trash2, ChevronDown, ChevronUp, Check, Flag, X, Pencil, ArrowUp, ArrowDown, Calendar } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp, Check, Flag, X, Pencil, ArrowUp, ArrowDown, Calendar, Timer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useRestTimer } from "@/hooks/useRestTimer";
@@ -21,6 +21,7 @@ interface ExerciseData {
   id: string;
   name: string;
   sort_order: number;
+  rest_seconds: number;
   sets: SetData[];
 }
 
