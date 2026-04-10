@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Plus, Trash2, ChevronDown, ChevronUp, Check, Flag, X, Pencil, ArrowUp, ArrowDown, Calendar } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp, Check, Flag, X, Pencil, ArrowUp, ArrowDown, Calendar, Timer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useRestTimer } from "@/hooks/useRestTimer";
@@ -21,6 +21,7 @@ interface ExerciseData {
   id: string;
   name: string;
   sort_order: number;
+  rest_seconds: number;
   sets: SetData[];
 }
 
@@ -97,7 +98,7 @@ export default function WorkoutPage() {
     const exercisesByWorkout = new Map<string, ExerciseData[]>();
     for (const ex of exData) {
       const arr = exercisesByWorkout.get(ex.workout_id) || [];
-      arr.push({ id: ex.id, name: ex.name, sort_order: ex.sort_order, sets: setsByExercise.get(ex.id) || [] });
+      arr.push({ id: ex.id, name: ex.name, sort_order: ex.sort_order, rest_seconds: (ex as any).rest_seconds ?? 60, sets: setsByExercise.get(ex.id) || [] });
       exercisesByWorkout.set(ex.workout_id, arr);
     }
 
@@ -187,7 +188,7 @@ export default function WorkoutPage() {
     if (error || !data) { toast.error("Erro ao adicionar exercício"); return; }
     setWorkouts(prev => prev.map(w => w.id === workoutId ? {
       ...w,
-      exercises: [...w.exercises, { id: data.id, name: data.name, sort_order: data.sort_order, sets: [] }],
+      exercises: [...w.exercises, { id: data.id, name: data.name, sort_order: data.sort_order, rest_seconds: (data as any).rest_seconds ?? 60, sets: [] }],
     } : w));
   };
 
@@ -212,7 +213,7 @@ export default function WorkoutPage() {
     })));
   };
 
-  const updateSet = async (setId: string, field: string, value: any) => {
+  const updateSet = async (setId: string, field: string, value: any, exerciseRestSeconds?: number) => {
     setWorkouts(prev => prev.map(w => ({
       ...w,
       exercises: w.exercises.map(ex => ({
@@ -223,7 +224,7 @@ export default function WorkoutPage() {
     const updateData: any = { [field]: value };
     if (field === "completed" && value === true) {
       updateData.completed_at = new Date().toISOString();
-      startTimer(undefined, setId);
+      startTimer(exerciseRestSeconds ?? 60, setId);
     }
     if (field === "completed" && value === false) {
       if (activeSetId === setId) {
@@ -231,6 +232,14 @@ export default function WorkoutPage() {
       }
     }
     await supabase.from("sets").update(updateData).eq("id", setId);
+  };
+
+  const updateExerciseRest = async (exerciseId: string, restSeconds: number) => {
+    setWorkouts(prev => prev.map(w => ({
+      ...w,
+      exercises: w.exercises.map(ex => ex.id === exerciseId ? { ...ex, rest_seconds: restSeconds } : ex),
+    })));
+    await supabase.from("exercises").update({ rest_seconds: restSeconds } as any).eq("id", exerciseId);
   };
 
   const deleteSet = async (setId: string) => {
@@ -442,9 +451,28 @@ export default function WorkoutPage() {
                   <div key={exercise.id} className="bg-muted/50 rounded-lg p-3 space-y-2">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-sm text-foreground">{exercise.name}</h3>
-                      <button onClick={() => deleteExercise(exercise.id)}>
-                        <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <Timer className="w-3 h-3 text-muted-foreground" />
+                          <select
+                            value={exercise.rest_seconds}
+                            onChange={(e) => updateExerciseRest(exercise.id, Number(e.target.value))}
+                            className="bg-transparent text-[10px] font-display font-bold text-primary border border-border rounded px-1 py-0.5 focus:outline-none focus:border-primary"
+                          >
+                            <option value={15}>15s</option>
+                            <option value={30}>30s</option>
+                            <option value={45}>45s</option>
+                            <option value={60}>1:00</option>
+                            <option value={90}>1:30</option>
+                            <option value={120}>2:00</option>
+                            <option value={150}>2:30</option>
+                            <option value={180}>3:00</option>
+                          </select>
+                        </div>
+                        <button onClick={() => deleteExercise(exercise.id)}>
+                          <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
+                      </div>
                     </div>
 
                     {exercise.sets.length > 0 && (
@@ -468,7 +496,7 @@ export default function WorkoutPage() {
                           <SetInput value={set.weight} field="weight" onSave={(v) => updateSet(set.id, "weight", v)} />
                           <SetInput value={set.reps} field="reps" onSave={(v) => updateSet(set.id, "reps", v)} />
                           <button
-                            onClick={() => updateSet(set.id, "completed", !set.completed)}
+                            onClick={() => updateSet(set.id, "completed", !set.completed, exercise.rest_seconds)}
                             className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${
                               set.completed
                                 ? "bg-success text-success-foreground"

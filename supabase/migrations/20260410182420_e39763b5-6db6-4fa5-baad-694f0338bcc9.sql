@@ -1,0 +1,1 @@
+ALTER TABLE public.exercises ADD COLUMN rest_seconds integer NOT NULL DEFAULT 60;
