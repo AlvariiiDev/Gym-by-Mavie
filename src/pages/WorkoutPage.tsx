@@ -177,6 +177,15 @@ export default function WorkoutPage() {
     if (!user) return;
     const name = prompt("Nome do exercício:");
     if (!name?.trim()) return;
+    const trimmedName = name.trim();
+    if (trimmedName.length < 2) {
+      toast.error("Nome muito curto (mínimo 2 caracteres)");
+      return;
+    }
+    if (trimmedName.length > 100) {
+      toast.error("Nome muito longo (máximo 100 caracteres)");
+      return;
+    }
     const workout = workouts.find(w => w.id === workoutId);
     const sortOrder = workout ? workout.exercises.length : 0;
     const { data, error } = await supabase.from("exercises").insert({
