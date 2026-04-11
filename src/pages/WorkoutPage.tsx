@@ -191,7 +191,7 @@ export default function WorkoutPage() {
     const { data, error } = await supabase.from("exercises").insert({
       workout_id: workoutId,
       user_id: user.id,
-      name: name.trim(),
+      name: trimmedName,
       sort_order: sortOrder,
     }).select().single();
     if (error || !data) { toast.error("Erro ao adicionar exercício"); return; }
