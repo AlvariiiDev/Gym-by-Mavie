@@ -10,6 +10,7 @@ import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
 import FriendProfilePage from "./pages/FriendProfilePage";
 import BottomNav from "./components/BottomNav";
+import FloatingAIChat from "./components/FloatingAIChat";
 import { RestTimerProvider } from "./hooks/useRestTimer";
 import NotFound from "./pages/NotFound";
 
@@ -23,7 +24,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     </div>
   );
   if (!user) return <Navigate to="/" replace />;
-  return <RestTimerProvider>{children}<BottomNav /></RestTimerProvider>;
+  return <RestTimerProvider>{children}<BottomNav /><FloatingAIChat /></RestTimerProvider>;
 }
 
 function AuthRoute() {
