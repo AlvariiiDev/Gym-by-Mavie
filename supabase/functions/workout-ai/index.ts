@@ -348,10 +348,23 @@ serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    
+    // Extract JWT token to get user identity
+    const token = authHeader.replace("Bearer ", "");
+    
+    // Create admin client to verify user, then user-scoped client for RLS
+    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+    const { data: { user: verifiedUser }, error: authError } = await adminClient.auth.getUser(token);
+    if (authError || !verifiedUser) {
+      return new Response(JSON.stringify({ error: "Não autorizado" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Use service role client for DB operations (bypasses RLS since we verified user)
+    const supabase = adminClient;
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
