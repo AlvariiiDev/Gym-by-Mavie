@@ -601,6 +601,8 @@ export default function WorkoutPage() {
           </div>
         </div>
       )}
+
+      <FloatingAIChat onDataChanged={loadWorkouts} />
     </div>
   );
 }
