@@ -366,13 +366,7 @@ serve(async (req) => {
     // Use service role client for DB operations (bypasses RLS since we verified user)
     const supabase = adminClient;
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Não autorizado" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const user = verifiedUser;
 
     const { messages } = await req.json();
     if (!messages || !Array.isArray(messages)) {
