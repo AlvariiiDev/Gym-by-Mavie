@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Plus, Trash2, ChevronDown, ChevronUp, Check, Flag, X, Pencil, ArrowUp, ArrowDown, Calendar, Timer } from "lucide-react";
+import FloatingAIChat from "@/components/FloatingAIChat";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useRestTimer } from "@/hooks/useRestTimer";
@@ -600,6 +601,8 @@ export default function WorkoutPage() {
           </div>
         </div>
       )}
+
+      <FloatingAIChat onDataChanged={loadWorkouts} />
     </div>
   );
 }
